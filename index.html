@@ -70,6 +70,7 @@
             transition: border-color 0.2s;
         }
         .form-control:focus { border-color: var(--accent-blue); }
+        .form-control:invalid { border-color: var(--alert-red-text); }
         select.form-control { appearance: none; cursor: pointer; }
         .hidden { display: none !important; }
 
@@ -203,7 +204,7 @@
 
         <div class="form-group">
             <label>Monto del Préstamo ($)</label>
-            <input type="number" id="in_monto" class="form-control" value="100000" min="0">
+            <input type="number" id="in_monto" class="form-control" value="100000" min="1000" max="999999999">
         </div>
 
         <div class="form-group">
@@ -217,7 +218,7 @@
 
         <div class="form-group">
             <label id="label_plazo">Plazo (Meses)</label>
-            <input type="number" id="in_plazo" class="form-control" value="12" min="1">
+            <input type="number" id="in_plazo" class="form-control" value="12" min="1" max="360">
         </div>
 
         <div class="form-group">
@@ -230,7 +231,7 @@
 
         <div class="form-group">
             <label>Valor de la Tasa (%)</label>
-            <input type="number" id="in_tasa" class="form-control" value="5" min="0" step="0.1">
+            <input type="number" id="in_tasa" class="form-control" value="5" min="0" max="100" step="0.1">
         </div>
 
         <div class="form-group">
@@ -244,7 +245,7 @@
 
         <div class="form-group hidden" id="group_tiempo_gracia">
             <label id="label_tiempo_gracia">Duración de Gracia (Meses)</label>
-            <input type="number" id="in_tiempo_gracia" class="form-control" value="2" min="1">
+            <input type="number" id="in_tiempo_gracia" class="form-control" value="2" min="1" max="120">
         </div>
 
         <div class="form-group">
@@ -257,7 +258,7 @@
 
         <div class="form-group hidden" id="group_cuota_manual">
             <label>Valor de Cuota Manual ($)</label>
-            <input type="number" id="in_cuota_manual" class="form-control" value="10000" min="0">
+            <input type="number" id="in_cuota_manual" class="form-control" value="10000" min="0" max="999999999">
         </div>
         
         <div class="sidebar-nota" style="margin-top: 1.5rem; padding: 0.8rem; background-color: #0f172a; border-radius: 0.375rem; border: 1px dashed #475569;">
@@ -271,7 +272,7 @@
         <div class="header-dashboard">
             <h1 style="font-size: 1.6rem; color:#0f172a;">Dashboard Financiero</h1>
             <button class="btn-pdf" onclick="window.print()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
                 Exportar Reporte (PDF)
             </button>
         </div>
@@ -363,13 +364,47 @@
         actualizarDashboard();
     });
 
+    // CORRECCIÓN 3: Validación de división por cero en fórmula de cuota francesa
     function calcularCuotaFrancesa(tasa, periodos, monto) {
+        // Validar que periodos sea mayor a 0
+        if (periodos <= 0) return monto;
+        
+        // Si tasa es 0, simplemente dividir
         if (tasa === 0) return monto / periodos;
-        return (monto * tasa * Math.pow(1 + tasa, periodos)) / (Math.pow(1 + tasa, periodos) - 1);
+        
+        // Validar que (1 + tasa) no sea -1 para evitar división por cero
+        if (Math.abs(tasa + 1) < 0.0001) return monto / periodos;
+        
+        // Cálculo seguro de la cuota francesa
+        const potencia = Math.pow(1 + tasa, periodos);
+        const denominador = potencia - 1;
+        
+        // Si denominador es muy pequeño, usar aproximación
+        if (Math.abs(denominador) < 0.0001) return monto / periodos;
+        
+        return (monto * tasa * potencia) / denominador;
     }
 
     // Motor de Simulación Avanzado adaptado a Periodo de Gracia y Frecuencias
     function simularPrestamo(monto, totalPeriodos, tasaPeriodica, tipoCuota, cuotaManual, tipoGracia, periodosGracia, abonosExtra, sistema) {
+        // CORRECCIÓN 1: Validación de parámetros de entrada
+        monto = Math.max(0, parseFloat(monto) || 0);
+        totalPeriodos = Math.max(1, parseInt(totalPeriodos) || 1);
+        tasaPeriodica = Math.max(0, parseFloat(tasaPeriodica) || 0);
+        periodosGracia = Math.max(0, parseInt(periodosGracia) || 0);
+        
+        if (monto === 0) {
+            return { 
+                cuotaAplicada: 0, 
+                totalPagado: 0, 
+                totalInteres: 0, 
+                saldoFinal: 0, 
+                periodosTotales: 0, 
+                amortizacionNegativa: false, 
+                lineas: [] 
+            };
+        }
+
         let saldo = monto;
         let totalPagado = 0;
         let totalInteres = 0;
@@ -405,9 +440,13 @@
                     abonoCapitalBase = -interesMes; // Se capitaliza de forma negativa
                 }
             } else {
-                // Periodo de amortización normal (Recalcular cuota si salió de gracia total)
-                if (i === periodosGracia + 1 && tipoCuota === 'auto' && sistema === 'tradicional') {
-                    cuotaFija = calcularCuotaFrancesa(tasaPeriodica, totalPeriodos - periodosGracia, saldo);
+                // CORRECCIÓN 2: Mejor manejo del recálculo después de gracia total
+                // Solo recalcular si salimos de gracia total y el saldo es válido
+                if (i === periodosGracia + 1 && tipoCuota === 'auto' && sistema === 'tradicional' && saldo > 0) {
+                    const periodosRestantes = totalPeriodos - periodosGracia;
+                    if (periodosRestantes > 0) {
+                        cuotaFija = calcularCuotaFrancesa(tasaPeriodica, periodosRestantes, Math.max(0.01, saldo));
+                    }
                 }
                 cuotaReal = cuotaFija;
                 abonoCapitalBase = cuotaReal - interesMes;
@@ -457,16 +496,29 @@
     };
 
     function actualizarDashboard() {
+        // Obtener y validar todos los valores de entrada
         const sistema = document.getElementById('in_sistema').value;
-        const monto = parseFloat(document.getElementById('in_monto').value) || 0;
-        const plazoRaw = parseInt(document.getElementById('in_plazo').value) || 1;
+        let monto = parseFloat(document.getElementById('in_monto').value) || 100000;
+        let plazoRaw = parseInt(document.getElementById('in_plazo').value) || 1;
         const frecuencia = document.getElementById('in_frecuencia').value;
         const tipoTasa = document.getElementById('in_tipo_tasa').value;
-        const valorTasa = parseFloat(document.getElementById('in_tasa').value) || 0;
+        let valorTasa = parseFloat(document.getElementById('in_tasa').value) || 0;
         const tipoCuota = document.getElementById('in_tipo_cuota').value;
-        const cuotaManual = parseFloat(document.getElementById('in_cuota_manual').value) || 0;
+        let cuotaManual = parseFloat(document.getElementById('in_cuota_manual').value) || 0;
         const tipoGracia = document.getElementById('in_tipo_gracia').value;
-        const tiempoGracia = tipoGracia !== 'ninguno' ? (parseInt(document.getElementById('in_tiempo_gracia').value) || 0) : 0;
+        let tiempoGracia = tipoGracia !== 'ninguno' ? (parseInt(document.getElementById('in_tiempo_gracia').value) || 0) : 0;
+
+        // CORRECCIÓN 1: Validar valores de entrada
+        monto = Math.max(1000, Math.min(999999999, monto));
+        plazoRaw = Math.max(1, Math.min(360, plazoRaw));
+        valorTasa = Math.max(0, Math.min(100, valorTasa));
+        tiempoGracia = Math.max(0, Math.min(120, tiempoGracia));
+        cuotaManual = Math.max(0, cuotaManual);
+
+        // Actualizar inputs con valores validados
+        document.getElementById('in_monto').value = monto;
+        document.getElementById('in_plazo').value = plazoRaw;
+        document.getElementById('in_tasa').value = valorTasa;
 
         // Tasas ajustadas de forma precisa según la frecuencia de cobro elegida
         let tasaMensualInteres = tipoTasa === 'anual' ? (valorTasa / 100) / 12 : valorTasa / 100;
