@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Préstamos Avanzado</title>
+    <title>Simulador de Préstamos Profesional y Multisistema</title>
     <style>
         :root {
             --bg-body: #f8fafc;
@@ -11,11 +11,11 @@
             --bg-card: #ffffff;
             --text-main: #334155;
             --text-light: #f8fafc;
-            --accent-blue: #3b82f6;
-            --accent-green: #22c55e;
-            --accent-purple: #a855f7;
+            --accent-blue: #2563eb;
+            --accent-green: #16a34a;
+            --accent-purple: #7c3aed;
             --alert-red-bg: #fee2e2;
-            --alert-red-text: #ef4444;
+            --alert-red-text: #dc2626;
             --border-color: #e2e8f0;
         }
 
@@ -40,8 +40,9 @@
             margin: 0 auto;
         }
 
+        /* Sidebar - Responsivo */
         .sidebar {
-            width: 320px;
+            width: 340px;
             background-color: var(--bg-sidebar);
             color: var(--text-light);
             padding: 2rem 1.5rem;
@@ -50,20 +51,21 @@
             height: 100vh;
             position: sticky;
             top: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
         }
 
-        .sidebar h2 { font-size: 1.25rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; font-size: 0.875rem; margin-bottom: 0.5rem; color: #cbd5e1; }
+        .sidebar h2 { font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: #fff;}
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-size: 0.85rem; margin-bottom: 0.4rem; color: #cbd5e1; font-weight: 500; }
         
         .form-control {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.7rem;
             border-radius: 0.375rem;
             border: 1px solid #475569;
             background-color: #0f172a;
             color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
             outline: none;
             transition: border-color 0.2s;
         }
@@ -71,58 +73,119 @@
         select.form-control { appearance: none; cursor: pointer; }
         .hidden { display: none !important; }
 
+        /* Contenido Principal */
         .main-content {
             flex-grow: 1;
             padding: 2rem;
             overflow-y: auto;
         }
 
+        .header-dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .btn-pdf {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .btn-pdf:hover { background-color: #1d4ed8; }
+
         .section-title {
-            font-size: 1.5rem; color: #0f172a; margin-bottom: 1.5rem; padding-bottom: 0.5rem;
+            font-size: 1.3rem; color: #0f172a; margin-bottom: 1.2rem; padding-bottom: 0.4rem;
             border-bottom: 2px solid var(--border-color);
         }
 
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-        .card { background-color: var(--bg-card); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--border-color); }
-        .card-title { font-size: 0.875rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .card-value { font-size: 1.5rem; font-weight: 700; color: #0f172a; }
+        /* Tarjetas de Resumen */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+        .card { background-color: var(--bg-card); padding: 1.2rem; border-radius: 0.5rem; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.4rem; font-weight: 600; }
+        .card-value { font-size: 1.4rem; font-weight: 700; color: #0f172a; }
         
-        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; margin-top: 0.5rem; }
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; margin-top: 0.5rem; }
         .status-ok { background-color: #dcfce7; color: #166534; }
         .status-warning { background-color: var(--alert-red-bg); color: var(--alert-red-text); }
         .status-purple { background-color: #f3e8ff; color: #6b21a8; }
 
-        .table-container { background: var(--bg-card); border-radius: 0.5rem; overflow-x: auto; margin-bottom: 2.5rem; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; text-align: right; }
-        th, td { padding: 1rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-        th { background-color: #f1f5f9; color: #475569; font-weight: 600; font-size: 0.875rem; position: sticky; top: 0; }
+        /* Tablas adaptadas a móvil */
+        .table-container { background: var(--bg-card); border-radius: 0.5rem; overflow-x: auto; margin-bottom: 2rem; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.9rem; }
+        th, td { padding: 0.85rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        th { background-color: #f1f5f9; color: #475569; font-weight: 600; position: sticky; top: 0; }
         th:first-child, td:first-child { text-align: center; }
         tr:hover { background-color: #f8fafc; }
+        
         .row-negative { background-color: var(--alert-red-bg) !important; color: var(--alert-red-text); }
+        .row-gracia { background-color: #eff6ff !important; color: #1d4ed8; }
         .text-green { color: var(--accent-green); font-weight: 600;}
 
         .input-tabla {
-            width: 120px;
-            padding: 0.5rem;
+            width: 100px;
+            padding: 0.4rem;
             border: 1px solid #cbd5e1;
             border-radius: 0.25rem;
             text-align: right;
-            font-size: 0.95rem;
-            color: #0f172a;
+            font-size: 0.85rem;
             outline: none;
-            transition: all 0.2s;
-            background-color: #fff;
-        }
-        .input-tabla:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        @media (max-width: 1024px) {
+        /* COMPATIBILIDAD MÓVIL (MEDIA QUERIES) */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
             .app-container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: static; }
+            .sidebar { width: 100%; height: auto; position: static; padding: 1.5rem; }
+            .main-content { padding: 1.5rem 1rem; }
+            .header-dashboard { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+            .btn-pdf { width: 100%; justify-content: center; }
+            .summary-grid { grid-template-columns: 1fr 1fr; }
         }
-    </style>
+
+        @media (max-width: 480px) {
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+
+/* ESTILOS EXCLUSIVOS PARA EXPORTACIÓN A PDF (VISTA CLIENTE) */
+        @media print {
+            body { background: white; color: black; }
+            
+            /* OCULTAR TODO LO PRIVADO DEL PRESTAMISTA */
+            .sidebar, 
+            .btn-pdf, 
+            .input-tabla-td input, 
+            .sidebar-nota,
+            .table-container:nth-of-type(1), /* Oculta la tabla comparativa */
+            .table-container:nth-of-type(2) th:nth-child(3), /* Oculta columna Abono a Capital */
+            .table-container:nth-of-type(2) td:nth-child(3),
+            .table-container:nth-of-type(2) th:nth-child(4), /* Oculta columna Interés Generado */
+            .table-container:nth-of-type(2) td:nth-child(4),
+            .table-container:nth-of-type(2) th:nth-child(5), /* Oculta columna Abono Extra */
+            .table-container:nth-of-type(2) td:nth-child(5) { 
+                display: none !important; 
+            }
+
+            .main-content { width: 100%; padding: 0; margin: 0; }
+            
+            /* ESTILIZAR EL RECIBO PARA EL CLIENTE */
+            .section-title { font-size: 1.1rem; border-bottom: 1px solid #000; margin-top: 1.5rem; }
+            .section-title:nth-of-type(2) { display: none; } /* Oculta el título "Escenarios Comparativos" */
+            
+            .table-container { border: none; box-shadow: none; overflow: visible; margin-bottom: 1rem; }
+            th { background-color: #f1f5f9 !important; color: #000 !important; border-bottom: 2px solid #000; }
+            td, th { padding: 8px; font-size: 12px; page-break-inside: avoid; text-align: center; }
+            .card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
+        }    </style>
 </head>
 <body>
 
@@ -140,23 +203,50 @@
 
         <div class="form-group">
             <label>Monto del Préstamo ($)</label>
-            <input type="number" id="in_monto" class="form-control" value="100000" min="0" step="1000">
+            <input type="number" id="in_monto" class="form-control" value="100000" min="0">
         </div>
+
         <div class="form-group">
-            <label>Plazo (Meses)</label>
-            <input type="number" id="in_plazo" class="form-control" value="60" min="1">
+            <label>Frecuencia de Pagos</label>
+            <select id="in_frecuencia" class="form-control">
+                <option value="mensual" selected>Mensual</option>
+                <option value="quincenal">Quincenal</option>
+                <option value="semanal">Semanal</option>
+            </select>
         </div>
+
         <div class="form-group">
-            <label>Tipo de Tasa</label>
+            <label id="label_plazo">Plazo (Meses)</label>
+            <input type="number" id="in_plazo" class="form-control" value="12" min="1">
+        </div>
+
+        <div class="form-group">
+            <label>Tipo de Tasa de Interés</label>
             <select id="in_tipo_tasa" class="form-control">
                 <option value="anual">Anual Bancaria (%)</option>
                 <option value="mensual" selected>Mensual Libre (%)</option>
             </select>
         </div>
+
         <div class="form-group">
             <label>Valor de la Tasa (%)</label>
             <input type="number" id="in_tasa" class="form-control" value="5" min="0" step="0.1">
         </div>
+
+        <div class="form-group">
+            <label>Periodo de Gracia</label>
+            <select id="in_tipo_gracia" class="form-control">
+                <option value="ninguno" selected>Ninguno</option>
+                <option value="parcial">Gracia Parcial (Solo Interés)</option>
+                <option value="total">Gracia Total (Suma al Capital)</option>
+            </select>
+        </div>
+
+        <div class="form-group hidden" id="group_tiempo_gracia">
+            <label id="label_tiempo_gracia">Duración de Gracia (Meses)</label>
+            <input type="number" id="in_tiempo_gracia" class="form-control" value="2" min="1">
+        </div>
+
         <div class="form-group">
             <label>Definición de Cuota</label>
             <select id="in_tipo_cuota" class="form-control">
@@ -164,23 +254,32 @@
                 <option value="manual">Fija Manual</option>
             </select>
         </div>
+
         <div class="form-group hidden" id="group_cuota_manual">
             <label>Valor de Cuota Manual ($)</label>
-            <input type="number" id="in_cuota_manual" class="form-control" value="5000" min="0">
+            <input type="number" id="in_cuota_manual" class="form-control" value="10000" min="0">
         </div>
         
-        <div style="margin-top: 2rem; padding: 1rem; background-color: #0f172a; border-radius: 0.5rem; border: 1px dashed #475569;">
-            <p style="font-size: 0.85rem; line-height: 1.4; color: #94a3b8;">
-                ℹ️ <strong>Nota:</strong> En el modo Pagadiario, los intereses no bajan aunque hagas abonos extraordinarios, pues siempre se calculan sobre el capital del día uno.
+        <div class="sidebar-nota" style="margin-top: 1.5rem; padding: 0.8rem; background-color: #0f172a; border-radius: 0.375rem; border: 1px dashed #475569;">
+            <p style="font-size: 0.8rem; line-height: 1.4; color: #94a3b8;">
+                📝 El sistema recalcula automáticamente en tiempo real al detectar cualquier cambio.
             </p>
         </div>
     </aside>
 
     <main class="main-content">
+        <div class="header-dashboard">
+            <h1 style="font-size: 1.6rem; color:#0f172a;">Dashboard Financiero</h1>
+            <button class="btn-pdf" onclick="window.print()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Exportar Reporte (PDF)
+            </button>
+        </div>
+        
         <h3 class="section-title">Resumen Financiero</h3>
         <div class="summary-grid">
             <div class="card">
-                <div class="card-title">Cuota Mensual Efectiva</div>
+                <div class="card-title" id="lbl_cuota_efectiva">Cuota Periódica</div>
                 <div class="card-value" id="out_cuota">$0</div>
             </div>
             <div class="card">
@@ -192,37 +291,37 @@
                 <div class="card-value" id="out_total_interes">$0</div>
             </div>
             <div class="card">
-                <div class="card-title">Estado del Préstamo</div>
+                <div class="card-title">Estado del Ejercicio</div>
                 <div id="out_estado_badge" class="status-badge status-ok">Calculando...</div>
             </div>
         </div>
 
-        <h3 class="section-title">Escenarios Comparativos</h3>
+        <h3 class="section-title">Análisis Comparativo de Escenarios</h3>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th style="text-align: left;">Concepto</th>
+                        <th style="text-align: left;">Concepto Financiero</th>
                         <th>Escenario Base (Sin Extras)</th>
-                        <th>Escenario Actual (Con Extras)</th>
-                        <th>Diferencia / Ahorro</th>
+                        <th>Escenario con Abonos Extras</th>
+                        <th>Variación / Ahorros</th>
                     </tr>
                 </thead>
                 <tbody id="out_comparativa_body"></tbody>
             </table>
         </div>
 
-        <h3 class="section-title">Tabla de Amortización Dinámica</h3>
+        <h3 class="section-title">Tabla de Amortización de Cuotas</h3>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>N°</th>
-                        <th>Pago Mensual</th>
-                        <th>Abono a Capital (Base)</th>
-                        <th>Interés del Mes</th>
-                        <th>Abono Extra a Capital ($)</th>
-                        <th>Saldo Restante</th>
+                        <th id="th_periodo">N° Periodo</th>
+                        <th>Valor Cuota</th>
+                        <th>Abono Capital</th>
+                        <th>Interés Generado</th>
+                        <th>Abono Extra ($)</th>
+                        <th>Saldo Pendiente</th>
                     </tr>
                 </thead>
                 <tbody id="out_amortizacion_body"></tbody>
@@ -236,68 +335,90 @@
     const inputs = document.querySelectorAll('.sidebar input, .sidebar select');
     const toggleCuota = document.getElementById('in_tipo_cuota');
     const groupCuotaManual = document.getElementById('group_cuota_manual');
-    const selectorSistema = document.getElementById('in_sistema');
-    const selectorTipoTasa = document.getElementById('in_tipo_tasa');
-    const inputTasa = document.getElementById('in_tasa');
+    const inTipoGracia = document.getElementById('in_tipo_gracia');
+    const groupTiempoGracia = document.getElementById('group_tiempo_gracia');
+    const inFrecuencia = document.getElementById('in_frecuencia');
 
     let abonosExtraPorMes = {};
 
-    // Forzar cambios dinámicos intuitivos según el sistema seleccionado
-    selectorSistema.addEventListener('change', (e) => {
-        if(e.target.value === 'pagadiario') {
-            selectorTipoTasa.value = 'mensual';
-            inputTasa.value = 5; // Un valor típico de ejemplo diario/mensual
-        } else {
-            selectorTipoTasa.value = 'anual';
-            inputTasa.value = 12;
-        }
+    // Reactividad en selectores
+    inFrecuencia.addEventListener('change', (e) => {
+        const f = e.target.value;
+        document.getElementById('label_plazo').textContent = `Plazo (${f === 'mensual' ? 'Meses' : f === 'quincenal' ? 'Quincenas' : 'Semanas'})`;
+        document.getElementById('label_tiempo_gracia').textContent = `Duración de Gracia (${f === 'mensual' ? 'Meses' : f === 'quincenal' ? 'Quincenas' : 'Semanas'})`;
+        document.getElementById('lbl_cuota_efectiva').textContent = `Cuota ${f === 'mensual' ? 'Mensual' : f === 'quincenal' ? 'Quincenal' : 'Semanal'}`;
+        document.getElementById('th_periodo').textContent = `N° ${f === 'mensual' ? 'Mes' : f === 'quincenal' ? 'Quincena' : 'Semana'}`;
+        actualizarDashboard();
+    });
+
+    inTipoGracia.addEventListener('change', (e) => {
+        if(e.target.value !== 'ninguno') groupTiempoGracia.classList.remove('hidden');
+        else groupTiempoGracia.classList.add('hidden');
         actualizarDashboard();
     });
 
     toggleCuota.addEventListener('change', (e) => {
         if(e.target.value === 'manual') groupCuotaManual.classList.remove('hidden');
         else groupCuotaManual.classList.add('hidden');
+        actualizarDashboard();
     });
 
-    function calcularCuotaFrancesa(tasaMensual, periodos, monto) {
-        if (tasaMensual === 0) return monto / periodos;
-        return (monto * tasaMensual * Math.pow(1 + tasaMensual, periodos)) / (Math.pow(1 + tasaMensual, periodos) - 1);
+    function calcularCuotaFrancesa(tasa, periodos, monto) {
+        if (tasa === 0) return monto / periodos;
+        return (monto * tasa * Math.pow(1 + tasa, periodos)) / (Math.pow(1 + tasa, periodos) - 1);
     }
 
-    // Motor Unificado de Simulación (Tradicional vs Pagadiario)
-    function simularPrestamo(monto, meses, tasaMensual, tipoCuota, cuotaManual, abonosExtra, sistema) {
+    // Motor de Simulación Avanzado adaptado a Periodo de Gracia y Frecuencias
+    function simularPrestamo(monto, totalPeriodos, tasaPeriodica, tipoCuota, cuotaManual, tipoGracia, periodosGracia, abonosExtra, sistema) {
         let saldo = monto;
         let totalPagado = 0;
         let totalInteres = 0;
         let amortizacionNegativa = false;
         let lineas = [];
         
+        let periodosAmortizables = totalPeriodos - periodosGracia;
+        if (periodosAmortizables <= 0) periodosAmortizables = 1;
+
         let cuotaFija = 0;
-        
         if (sistema === 'pagadiario') {
-            // Lógica Pagadiario: Interés plano total calculado desde el inicio
-            let interesFijoMes = monto * tasaMensual;
-            let totalInteresProyectado = interesFijoMes * meses;
-            cuotaFija = tipoCuota === 'auto' ? ((monto + totalInteresProyectado) / meses) : cuotaManual;
+            let interesFijo = monto * tasaPeriodica;
+            cuotaFija = tipoCuota === 'auto' ? ((monto + (interesFijo * totalPeriodos)) / totalPeriodos) : cuotaManual;
         } else {
-            // Lógica Tradicional: Sistema Francés sobre saldos
-            const cuotaAuto = calcularCuotaFrancesa(tasaMensual, meses, monto);
-            cuotaFija = tipoCuota === 'auto' ? cuotaAuto : cuotaManual;
+            cuotaFija = tipoCuota === 'auto' ? calcularCuotaFrancesa(tasaPeriodica, periodosAmortizables, monto) : cuotaManual;
         }
 
-        for (let i = 1; i <= meses; i++) {
-            // Definición crítica del interés según el sistema elegido
-            let interesMes = sistema === 'pagadiario' ? (monto * tasaMensual) : (saldo * tasaMensual);
-            let abonoCapitalBase = cuotaFija - interesMes;
-            let abonoExtra = abonosExtra[i] || 0; 
+        for (let i = 1; i <= totalPeriodos; i++) {
+            let interesMes = sistema === 'pagadiario' ? (monto * tasaPeriodica) : (saldo * tasaPeriodica);
+            let cuotaReal = 0;
+            let abonoCapitalBase = 0;
+            let abonoExtra = abonosExtra[i] || 0;
+            let enGracia = false;
+
+            // Lógica aplicada al periodo de gracia
+            if (i <= periodosGracia && tipoGracia !== 'ninguno') {
+                enGracia = true;
+                if (tipoGracia === 'parcial') {
+                    cuotaReal = interesMes;
+                    abonoCapitalBase = 0;
+                } else if (tipoGracia === 'total') {
+                    cuotaReal = 0;
+                    abonoCapitalBase = -interesMes; // Se capitaliza de forma negativa
+                }
+            } else {
+                // Periodo de amortización normal (Recalcular cuota si salió de gracia total)
+                if (i === periodosGracia + 1 && tipoCuota === 'auto' && sistema === 'tradicional') {
+                    cuotaFija = calcularCuotaFrancesa(tasaPeriodica, totalPeriodos - periodosGracia, saldo);
+                }
+                cuotaReal = cuotaFija;
+                abonoCapitalBase = cuotaReal - interesMes;
+            }
             
-            if (abonoCapitalBase < 0) amortizacionNegativa = true;
+            if (abonoCapitalBase < 0 && !enGracia) amortizacionNegativa = true;
 
             let abonoTotalCapital = abonoCapitalBase + abonoExtra;
-            let cuotaReal = cuotaFija;
 
-            // Ajuste de cierre para evitar saldos negativos al finalizar antes el capital
-            if (saldo <= abonoTotalCapital) {
+            // Ajuste del cierre definitivo de la cuenta
+            if (saldo <= abonoTotalCapital && !enGracia) {
                 abonoTotalCapital = saldo;
                 abonoCapitalBase = Math.max(0, saldo - abonoExtra);
                 cuotaReal = abonoCapitalBase + interesMes;
@@ -312,19 +433,20 @@
             if (saldo < 0.01) saldo = 0;
 
             lineas.push({
-                mes: i,
+                num: i,
                 pagoMensual: cuotaReal,
                 abonoCapitalBase: abonoCapitalBase,
                 interes: interesMes,
                 abonoExtra: abonoExtra,
                 saldoRestante: saldo,
-                esNegativo: abonoCapitalBase < 0
+                esNegativo: abonoCapitalBase < 0 && !enGracia,
+                esGracia: enGracia
             });
 
-            if (saldo <= 0) break;
+            if (saldo <= 0 && !enGracia) break;
         }
 
-        return { cuotaAplicada: cuotaFija, totalPagado, totalInteres, saldoFinal: saldo, mesesReales: lineas.length, amortizacionNegativa, lineas };
+        return { cuotaAplicada: cuotaFija, totalPagado, totalInteres, saldoFinal: saldo, periodosTotales: lineas.length, amortizacionNegativa, lineas };
     }
 
     window.registrarAbonoMesa = function(mes, inputElement) {
@@ -337,82 +459,94 @@
     function actualizarDashboard() {
         const sistema = document.getElementById('in_sistema').value;
         const monto = parseFloat(document.getElementById('in_monto').value) || 0;
-        const meses = parseInt(document.getElementById('in_plazo').value) || 1;
+        const plazoRaw = parseInt(document.getElementById('in_plazo').value) || 1;
+        const frecuencia = document.getElementById('in_frecuencia').value;
         const tipoTasa = document.getElementById('in_tipo_tasa').value;
         const valorTasa = parseFloat(document.getElementById('in_tasa').value) || 0;
         const tipoCuota = document.getElementById('in_tipo_cuota').value;
         const cuotaManual = parseFloat(document.getElementById('in_cuota_manual').value) || 0;
+        const tipoGracia = document.getElementById('in_tipo_gracia').value;
+        const tiempoGracia = tipoGracia !== 'ninguno' ? (parseInt(document.getElementById('in_tiempo_gracia').value) || 0) : 0;
 
-        let tasaMensual = tipoTasa === 'anual' ? (valorTasa / 100) / 12 : valorTasa / 100;
+        // Tasas ajustadas de forma precisa según la frecuencia de cobro elegida
+        let tasaMensualInteres = tipoTasa === 'anual' ? (valorTasa / 100) / 12 : valorTasa / 100;
+        let tasaPeriodica = tasaMensualInteres;
+        let totalPeriodos = plazoRaw;
 
-        // Escenario Base Puro (Sin Abonos Extra, usando el sistema seleccionado)
-        const simBase = simularPrestamo(monto, meses, tasaMensual, tipoCuota, cuotaManual, {}, sistema);
-        // Escenario Actual (Con los abonos extra dinámicos de la tabla)
-        const simActual = simularPrestamo(monto, meses, tasaMensual, tipoCuota, cuotaManual, abonosExtraPorMes, sistema);
+        if (frecuencia === 'quincenal') {
+            tasaPeriodica = tipoTasa === 'anual' ? (valorTasa / 100) / 24 : (valorTasa / 100) / 2;
+        } else if (frecuencia === 'semanal') {
+            tasaPeriodica = tipoTasa === 'anual' ? (valorTasa / 100) / 52 : (valorTasa / 100) / 4;
+        }
 
-        // Renderizar Tarjetas de Resumen
+        const simBase = simularPrestamo(monto, totalPeriodos, tasaPeriodica, tipoCuota, cuotaManual, tipoGracia, tiempoGracia, {}, sistema);
+        const simActual = simularPrestamo(monto, totalPeriodos, tasaPeriodica, tipoCuota, cuotaManual, tipoGracia, tiempoGracia, abonosExtraPorMes, sistema);
+
+        // Actualizar UI del Resumen
         document.getElementById('out_cuota').textContent = formatter.format(simActual.cuotaAplicada);
         document.getElementById('out_total_pagado').textContent = formatter.format(simActual.totalPagado);
         document.getElementById('out_total_interes').textContent = formatter.format(simActual.totalInteres);
         
         const badge = document.getElementById('out_estado_badge');
-        if (sistema === 'pagadiario' && simActual.saldoFinal === 0) {
-            badge.textContent = `Pagadiario saldado en ${simActual.mesesReales} meses`;
-            badge.className = 'status-badge status-purple';
-        } else if (simActual.saldoFinal > 0) {
-            badge.textContent = `Deuda activa. Saldo: ${formatter.format(simActual.saldoFinal)}`;
+        if (simActual.saldoFinal > 0) {
+            badge.textContent = `Activo. Resta: ${formatter.format(simActual.saldoFinal)}`;
             badge.className = 'status-badge status-warning';
         } else if (simActual.amortizacionNegativa) {
-            badge.textContent = '¡Alerta! Amortización Negativa';
+            badge.textContent = 'Amortización Negativa';
             badge.className = 'status-badge status-warning';
         } else {
-            badge.textContent = `Saldada en ${simActual.mesesReales} meses`;
+            badge.textContent = `Saldado en ${simActual.periodosTotales} periodos`;
             badge.className = 'status-badge status-ok';
         }
 
-        // Renderizar Tabla Comparativa
+        // Tabla Comparativa
         const ahorroDinero = simBase.totalPagado - simActual.totalPagado;
-        const ahorroMeses = simBase.mesesReales - simActual.mesesReales;
+        const ahorroMeses = simBase.periodosTotales - simActual.periodosTotales;
         
         document.getElementById('out_comparativa_body').innerHTML = `
             <tr>
-                <td style="text-align: left; font-weight:600;">Monto Total Pagado</td>
+                <td style="text-align: left; font-weight:600;">Desembolso Total Pagado</td>
                 <td>${formatter.format(simBase.totalPagado)}</td>
                 <td>${formatter.format(simActual.totalPagado)}</td>
                 <td class="${ahorroDinero >= 0 ? 'text-green' : 'row-negative'}">${ahorroDinero >= 0 ? '-' : '+'}${formatter.format(Math.abs(ahorroDinero))}</td>
             </tr>
             <tr>
-                <td style="text-align: left; font-weight:600;">Total de Intereses</td>
+                <td style="text-align: left; font-weight:600;">Intereses Consolidados</td>
                 <td>${formatter.format(simBase.totalInteres)}</td>
                 <td>${formatter.format(simActual.totalInteres)}</td>
                 <td class="${ahorroDinero >= 0 ? 'text-green' : 'row-negative'}">${ahorroDinero >= 0 ? '-' : '+'}${formatter.format(Math.abs(ahorroDinero))}</td>
             </tr>
             <tr>
-                <td style="text-align: left; font-weight:600;">Tiempo (Meses)</td>
-                <td>${simBase.mesesReales}</td>
-                <td>${simActual.mesesReales}</td>
-                <td class="${ahorroMeses >= 0 ? 'text-green' : 'row-negative'}">${ahorroMeses >= 0 ? '-' : '+'}${Math.abs(ahorroMeses)} meses</td>
+                <td style="text-align: left; font-weight:600;">Duración en Periodos</td>
+                <td>${simBase.periodosTotales}</td>
+                <td>${simActual.periodosTotales}</td>
+                <td class="${ahorroMeses >= 0 ? 'text-green' : 'row-negative'}">${ahorroMeses >= 0 ? '-' : '+'}${Math.abs(ahorroMeses)} cta(s)</td>
             </tr>
         `;
 
-        // Renderizar Tabla de Amortización Dinámica
-        document.getElementById('out_amortizacion_body').innerHTML = simActual.lineas.map(linea => `
-            <tr class="${linea.esNegativo ? 'row-negative' : ''}">
-                <td style="text-align: center; font-weight: 600; color: #64748b;">${linea.mes}</td>
-                <td>${formatter.format(linea.pagoMensual)}</td>
-                <td>${formatter.format(linea.abonoCapitalBase)}</td>
-                <td style="color: #ef4444;">${formatter.format(linea.interes)}</td>
-                <td>
-                    <input type="number" 
-                           class="input-tabla" 
-                           placeholder="Monto $" 
-                           min="0"
-                           value="${linea.abonoExtra > 0 ? linea.abonoExtra : ''}" 
-                           onchange="registrarAbonoMesa(${linea.mes}, this)">
-                </td>
-                <td style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">${formatter.format(linea.saldoRestante)}</td>
-            </tr>
-        `).join('');
+        // Construcción de la Tabla de Amortización Dinámica
+        document.getElementById('out_amortizacion_body').innerHTML = simActual.lineas.map(linea => {
+            let rowClass = '';
+            if (linea.esGracia) rowClass = 'row-gracia';
+            else if (linea.esNegativo) rowClass = 'row-negative';
+
+            return `
+                <tr class="${rowClass}">
+                    <td style="text-align: center; font-weight: 600;">${linea.num} ${linea.esGracia ? '(Gracia)' : ''}</td>
+                    <td>${formatter.format(linea.pagoMensual)}</td>
+                    <td>${formatter.format(linea.abonoCapitalBase)}</td>
+                    <td style="color: #dc2626;">${formatter.format(linea.interes)}</td>
+                    <td class="input-tabla-td">
+                        <input type="number" 
+                               class="input-tabla" 
+                               placeholder="Extra $" 
+                               value="${linea.abonoExtra > 0 ? linea.abonoExtra : ''}" 
+                               onchange="registrarAbonoMesa(${linea.num}, this)">
+                    </td>
+                    <td style="font-weight: 700; color: #0f172a;">${formatter.format(linea.saldoRestante)}</td>
+                </tr>
+            `;
+        }).join('');
     }
 
     inputs.forEach(input => input.addEventListener('input', actualizarDashboard));
